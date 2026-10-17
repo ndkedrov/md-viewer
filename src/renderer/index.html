@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src * data: blob: file:; font-src 'self' data:; media-src * file:; connect-src 'none'; frame-src 'none'; object-src 'none'" />
+  <title>MD Viewer</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="titlebar">
+    <div class="brand" title="MD Viewer">
+      <img src="assets/icon.svg" alt="" />
+    </div>
+    <div class="tabs-wrap">
+      <div class="tabs" id="tabs" role="tablist"></div>
+      <button class="icon-btn new-tab" id="btn-open" data-i18n-title="open">
+        <svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10" /></svg>
+      </button>
+    </div>
+    <div class="bar-actions">
+      <button class="icon-btn" id="btn-outline" data-i18n-title="outline">
+        <svg viewBox="0 0 16 16"><path d="M2.5 4h1M6 4h7.5M2.5 8h1M6 8h7.5M2.5 12h1M6 12h7.5" /></svg>
+      </button>
+      <button class="icon-btn" id="btn-theme" data-i18n-title="theme">
+        <svg class="i-moon" viewBox="0 0 16 16"><path d="M13.2 10.1A5.6 5.6 0 0 1 5.9 2.8a5.6 5.6 0 1 0 7.3 7.3Z" /></svg>
+        <svg class="i-sun" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.8" /><path d="M8 1.5v1.3M8 13.2v1.3M1.5 8h1.3M13.2 8h1.3M3.4 3.4l.9.9M11.7 11.7l.9.9M3.4 12.6l.9-.9M11.7 4.3l.9-.9" /></svg>
+      </button>
+      <button class="icon-btn" id="btn-menu" data-i18n-title="menu">
+        <svg viewBox="0 0 16 16"><circle cx="3.5" cy="8" r=".6" /><circle cx="8" cy="8" r=".6" /><circle cx="12.5" cy="8" r=".6" /></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="outline" id="outline">
+      <div class="outline-head" data-i18n="outline">Outline</div>
+      <nav class="outline-list" id="outline-list"></nav>
+    </aside>
+
+    <section class="viewer" id="viewer">
+      <div class="welcome" id="welcome">
+        <div class="welcome-inner">
+          <img class="welcome-logo" src="assets/icon.svg" alt="" />
+          <h1>MD Viewer</h1>
+          <p class="welcome-sub" data-i18n="tagline">Beautiful Markdown, in tabs.</p>
+          <div class="welcome-actions">
+            <button class="btn primary" id="welcome-open">
+              <svg viewBox="0 0 16 16"><path d="M2 4.5A1.5 1.5 0 0 1 3.5 3h2.6l1.4 1.5h5A1.5 1.5 0 0 1 14 6v5.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 11.5Z" /></svg>
+              <span data-i18n="openFiles">Open files</span>
+              <kbd>Ctrl O</kbd>
+            </button>
+          </div>
+          <p class="welcome-drop" data-i18n="dropHint">or drop .md files anywhere in this window</p>
+
+          <div class="recent" id="recent">
+            <div class="section-title" data-i18n="recent">Recent</div>
+            <ul id="recent-list"></ul>
+          </div>
+
+          <div class="shortcuts">
+            <div class="section-title" data-i18n="shortcuts">Shortcuts</div>
+            <dl>
+              <div><dt><kbd>Ctrl</kbd><kbd>Tab</kbd></dt><dd data-i18n="scNext">Next tab</dd></div>
+              <div><dt><kbd>Ctrl</kbd><kbd>W</kbd></dt><dd data-i18n="scClose">Close tab</dd></div>
+              <div><dt><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>T</kbd></dt><dd data-i18n="scReopen">Reopen closed tab</dd></div>
+              <div><dt><kbd>Ctrl</kbd><kbd>F</kbd></dt><dd data-i18n="scFind">Find in document</dd></div>
+              <div><dt><kbd>Ctrl</kbd><kbd>B</kbd></dt><dd data-i18n="scOutline">Toggle outline</dd></div>
+              <div><dt><kbd>Ctrl</kbd><kbd>+</kbd> / <kbd>−</kbd></dt><dd data-i18n="scZoom">Text size</dd></div>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="findbar" id="findbar" hidden>
+      <svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5" /><path d="m10.4 10.4 3.1 3.1" /></svg>
+      <input id="find-input" type="text" spellcheck="false" data-i18n-placeholder="findPlaceholder" />
+      <span class="find-count" id="find-count"></span>
+      <button class="icon-btn sm" id="find-prev" data-i18n-title="findPrev"><svg viewBox="0 0 16 16"><path d="m4 10 4-4 4 4" /></svg></button>
+      <button class="icon-btn sm" id="find-next" data-i18n-title="findNext"><svg viewBox="0 0 16 16"><path d="m4 6 4 4 4-4" /></svg></button>
+      <button class="icon-btn sm" id="find-close" data-i18n-title="close"><svg viewBox="0 0 16 16"><path d="m4.5 4.5 7 7m0-7-7 7" /></svg></button>
+    </div>
+  </main>
+
+  <footer class="statusbar" id="statusbar">
+    <span class="sb-path" id="sb-path"></span>
+    <span class="sb-spacer"></span>
+    <span class="sb-item" id="sb-updated" hidden></span>
+    <span class="sb-item" id="sb-words"></span>
+    <span class="sb-item" id="sb-time"></span>
+    <button class="sb-item sb-btn" id="sb-zoom" data-i18n-title="zoomReset"></button>
+  </footer>
+
+  <div class="drop-overlay" id="drop-overlay">
+    <div class="drop-card">
+      <svg viewBox="0 0 24 24"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14" /></svg>
+      <span data-i18n="dropHere">Drop to open</span>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+{
+  "name": "md-viewer",
+  "productName": "MD Viewer",
+  "version": "1.0.0",
+  "description": "A beautiful tabbed Markdown viewer for Windows",
+  "main": "src/main/main.js",
+  "author": "ndkedrov",
+  "license": "MIT",
+  "homepage": "https://github.com/ndkedrov/md-viewer",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ndkedrov/md-viewer.git"
+  },
+  "scripts": {
+    "postinstall": "node scripts/vendor.js",
+    "start": "electron .",
+    "icon": "electron scripts/make-icon.js",
+    "dist": "electron-builder --win nsis",
+    "dist:dir": "electron-builder --win dir"
+  },
+  "build": {
+    "appId": "com.ndkedrov.mdviewer",
+    "productName": "MD Viewer",
+    "copyright": "Copyright © 2026 ndkedrov",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "fileAssociations": [
+      {
+        "ext": [
+          "md",
+          "markdown",
+          "mdown",
+          "mkd"
+        ],
+        "name": "Markdown",
+        "description": "Markdown document",
+        "icon": "build/file.ico",
+        "role": "Viewer"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "MD-Viewer-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "MD Viewer",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "license": "LICENSE"
+    },
+    "electronLanguages": [
+      "en-US",
+      "uk"
+    ],
+    "compression": "maximum"
+  },
+  "dependencies": {
+    "highlight.js": "^11.12.0",
+    "markdown-it": "^15.0.3",
+    "markdown-it-anchor": "^10.0.0",
+    "markdown-it-emoji": "^3.1.0",
+    "markdown-it-footnote": "^4.0.0",
+    "markdown-it-task-lists": "^2.1.1"
+  },
+  "devDependencies": {
+    "electron": "^44.9.0",
+    "electron-builder": "^26.15.3",
+    "mermaid": "^12.2.0"
+  }
+}
