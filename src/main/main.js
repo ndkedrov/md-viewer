@@ -6,6 +6,7 @@ const path = require('path');
 const { pathToFileURL } = require('url');
 const { render } = require('./markdown');
 const store = require('./store');
+const assoc = require('./assoc');
 
 const MD_EXT = /\.(md|markdown|mdown|mkd|mdx|txt)$/i;
 const CHROME = {
@@ -200,6 +201,8 @@ ipcMain.handle('shell:external', (_e, url) => {
 });
 ipcMain.handle('shell:openPath', (_e, p) => shell.openPath(p));
 ipcMain.handle('shell:reveal', (_e, p) => shell.showItemInFolder(p));
+ipcMain.handle('assoc:status', () => assoc.status());
+ipcMain.handle('assoc:choose', (_e, p) => assoc.chooseDefault(p));
 ipcMain.handle('clipboard:write', (_e, text) => clipboard.writeText(String(text)));
 
 const isFile = (p) => {

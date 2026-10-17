@@ -833,6 +833,9 @@ async function mainMenu() {
     { id: 'zout', label: t('mZoomOut'), accelerator: 'Ctrl+-' },
     { id: 'zreset', label: t('mZoomReset'), accelerator: 'Ctrl+0' },
     { type: 'separator' },
+    ...(A.supported ? [A.isDefault
+      ? { id: 'assoc', label: t('mAssocOn'), type: 'checkbox', checked: true, enabled: false }
+      : { id: 'assoc', label: t('mAssoc') }] : []),
     { id: 'clear', label: t('mClearRecent'), enabled: S.recent.length > 0 },
     { id: 'about', label: `${t('mAbout')}  ·  v${S.version}` },
   ]);
@@ -850,6 +853,7 @@ async function mainMenu() {
   if (k === 'zreset') setZoom(1);
   if (k === 'clear') { S.recent = []; api.setSetting('recent', []); renderRecent(); }
   if (k === 'about') api.openExternal(GITHUB);
+  if (k === 'assoc') chooseDefaultApp();
 }
 
 function setLang(pref) {
@@ -859,6 +863,7 @@ function setLang(pref) {
   applyI18n();
   renderTabs();
   renderRecent();
+  renderAssoc();
   updateStatus();
   S.tabs.forEach((x) => x.data && loadTab(x)); // alert titles and copy buttons are localized
 }
@@ -963,6 +968,37 @@ function setupKeys() {
   }, { passive: false });
 }
 
+// ---------- default app for .md (Windows) ----------
+
+const A = { supported: false, isDefault: false, waiting: false, dismissed: false };
+
+async function refreshAssoc() {
+  const st = await api.assocStatus();
+  const became = A.waiting && !A.isDefault && st.isDefault;
+  A.supported = st.supported;
+  A.isDefault = st.isDefault;
+  if (became) {
+    A.waiting = false;
+    toast(t('assocDone'));
+  }
+  renderAssoc();
+}
+
+function renderAssoc() {
+  const card = $('#assoc-card');
+  card.hidden = !A.supported || A.isDefault || (A.dismissed && !A.waiting);
+  card.classList.toggle('waiting', A.waiting);
+  $('#assoc-sub').textContent = t(A.waiting ? 'assocWait' : 'assocText');
+  $('#assoc-yes').textContent = t(A.waiting ? 'assocAgain' : 'assocYes');
+}
+
+function chooseDefaultApp() {
+  const tab = activeTab();
+  A.waiting = true;
+  api.assocChoose(tab && tab.data && tab.data.ok ? tab.path : null);
+  renderAssoc();
+}
+
 // ---------- boot ----------
 
 async function boot() {
@@ -997,6 +1033,17 @@ async function boot() {
     }
   }, { passive: false });
   $('#tabs').addEventListener('dblclick', (e) => { if (e.target === e.currentTarget) openDialog(); });
+
+  $('#assoc-yes').addEventListener('click', chooseDefaultApp);
+  $('#assoc-no').addEventListener('click', () => {
+    A.dismissed = true;
+    A.waiting = false;
+    api.setSetting('assocDismissed', true);
+    renderAssoc();
+  });
+  A.dismissed = !!st.assocDismissed;
+  window.addEventListener('focus', refreshAssoc);
+  refreshAssoc();
 
   setupDrop();
   setupKeys();

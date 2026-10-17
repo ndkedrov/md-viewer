@@ -999,3 +999,36 @@ body.empty .statusbar > * { visibility: hidden; }
   .code-frame, .table-wrap, .mermaid-box, blockquote, img { break-inside: avoid; }
   .doc pre { white-space: pre-wrap; }
 }
+
+/* ---------------------------------------------------------------- default-app card */
+
+.assoc-card {
+  position: fixed;
+  right: 20px;
+  bottom: calc(var(--status-h) + 16px);
+  z-index: 15;
+  width: 380px;
+  max-width: calc(100vw - 40px);
+  display: flex;
+  gap: 14px;
+  padding: 16px 16px 14px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--bg-elev) 92%, transparent);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow);
+  animation: card-in 0.32s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+.assoc-icon { width: 40px; height: 40px; flex: 0 0 auto; filter: drop-shadow(0 6px 14px color-mix(in srgb, var(--accent) 40%, transparent)); }
+.assoc-body { min-width: 0; }
+.assoc-title { font-weight: 650; color: var(--text-strong); }
+.assoc-sub { margin-top: 3px; font-size: 13px; line-height: 1.45; color: var(--muted); }
+.assoc-card.waiting .assoc-sub { color: var(--accent); }
+.assoc-actions { display: flex; gap: 8px; margin-top: 12px; }
+.btn.small { height: 32px; padding: 0 12px; border-radius: 9px; font-size: 13px; }
+.btn.ghost { color: var(--muted); }
+.btn.ghost:hover { background: var(--bg-hover); color: var(--text-strong); }
+
+@keyframes card-in { from { opacity: 0; transform: translateY(14px) scale(0.98); } to { opacity: 1; transform: none; } }
+
+@media print { .assoc-card { display: none !important; } }

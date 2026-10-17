@@ -19,6 +19,8 @@ contextBridge.exposeInMainWorld('api', {
   copy: (text) => ipcRenderer.invoke('clipboard:write', text),
   getSettings: () => ipcRenderer.invoke('settings:get'),
   setSetting: (k, v) => ipcRenderer.invoke('settings:set', k, v),
+  assocStatus: () => ipcRenderer.invoke('assoc:status'),
+  assocChoose: (p) => ipcRenderer.invoke('assoc:choose', p),
   menu: (template) => ipcRenderer.invoke('menu:popup', template),
   pathForFile: (file) => webUtils.getPathForFile(file),
   onOpenFiles: on('open-files'),

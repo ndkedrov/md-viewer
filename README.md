@@ -29,6 +29,8 @@
 - **Find in document** (`Ctrl+F`), text size (`Ctrl` + wheel), page width, print.
 - **Light and dark themes** that follow Windows, or pick one yourself.
 - **English and Ukrainian** interface, chosen from the system language.
+- **Default app for `.md`**: the installer registers MD Viewer for Markdown files, and the app offers a one-click
+  “Make default” prompt (Windows asks you to confirm the choice once).
 - Remembers open tabs between launches; double-clicking a `.md` file opens it in the running window.
 - Safe to open unknown files: scripts and other active content in documents are stripped.
 
@@ -51,7 +53,11 @@
 
 Download `MD-Viewer-Setup-x.y.z.exe` from [Releases](https://github.com/ndkedrov/md-viewer/releases/latest)
 and run it. The installer lets you choose the folder, adds Start menu and desktop shortcuts, and registers
-MD Viewer for `.md` / `.markdown` files (it appears in **Open with**).
+MD Viewer for `.md` / `.markdown` files.
+
+To open Markdown files with a double click, press **Make default** on the prompt in the app (or **⋯ → Make default
+app for .md files**) and pick **MD Viewer → Always** in the Windows dialog. Windows does not let apps change the
+default on their own, so this one click is needed once.
 
 > Windows SmartScreen may warn that the app is from an unknown publisher, because the installer
 > is not code-signed. Click **More info → Run anyway**.
@@ -91,6 +97,8 @@ examples/       demo documents
 - Файл оновлюється сам, щойно ви зберегли його в іншому редакторі.
 - Таблиці, списки задач, підсвітка коду з кнопкою «Копіювати», діаграми Mermaid, блоки `> [!NOTE]`.
 - Світла й темна теми, інтерфейс українською.
+- Щоб .md файли відкривались подвійним кліком, натисніть **Зробити за замовчуванням** у програмі й виберіть
+  **MD Viewer → Завжди** у вікні Windows (один раз: Windows не дозволяє програмам змінювати це самостійно).
 
 **Встановлення:** завантажте `MD-Viewer-Setup-x.y.z.exe` зі сторінки
 [Releases](https://github.com/ndkedrov/md-viewer/releases/latest) і запустіть. Якщо Windows покаже

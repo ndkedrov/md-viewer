@@ -1,7 +1,7 @@
 {
   "name": "md-viewer",
   "productName": "MD Viewer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A beautiful tabbed Markdown viewer for Windows",
   "main": "src/main/main.js",
   "author": "ndkedrov",
@@ -38,7 +38,7 @@
           "mdown",
           "mkd"
         ],
-        "name": "Markdown",
+        "name": "MDViewer.Markdown",
         "description": "Markdown document",
         "icon": "build/file.ico",
         "role": "Viewer"
