@@ -179,6 +179,13 @@ kbd {
   z-index: 3;
 }
 
+/* macOS: traffic lights sit on the left (the Dock already shows the icon),
+   nothing to reserve on the right */
+.mac .titlebar { padding-left: 86px; padding-right: 0; }
+.mac .brand { display: none; }
+.mac.fullscreen .titlebar { padding-left: 0; }
+.mac.fullscreen .brand { display: grid; }
+
 .brand {
   width: 46px;
   flex: 0 0 auto;
@@ -820,6 +827,25 @@ body.no-outline .outline, body.empty .outline { border-right-color: transparent;
 .doc-error svg { width: 44px; height: 44px; color: var(--c-caution); margin-bottom: 8px; }
 .doc-error h2 { margin: 0; font-size: 1.3em; color: var(--text-strong); border: 0; }
 .doc-error code { font-size: 0.85em; word-break: break-all; }
+.doc-error .btn { margin-top: 12px; }
+
+/* App Store build: ask for the document's folder so local images can load */
+.access-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 22px;
+  padding: 10px 12px 10px 14px;
+  font: 0.9rem/1.4 var(--font-ui);
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 9%, var(--bg-elev));
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, var(--border));
+  border-radius: var(--radius);
+}
+.access-bar > svg { flex: 0 0 auto; width: 18px; height: 18px; color: var(--accent); }
+.access-bar .access-text { flex: 1 1 auto; min-width: 0; }
+.access-bar .btn { flex: 0 0 auto; }
+@media print { .access-bar { display: none !important; } }
 
 /* syntax colours (highlight.js classes) */
 .hljs-comment, .hljs-quote { color: var(--sx-comment); font-style: italic; }

@@ -1,10 +1,13 @@
 'use strict';
 
-// Rasterises the SVG icons into PNG + multi-size ICO files for the build.
+// Rasterises the SVG icons into PNG + multi-size ICO files for the build,
+// and on macOS also into ICNS files (via iconutil).
 // Run with: npm run icon
 
 const { app, BrowserWindow } = require('electron');
+const { execFileSync } = require('child_process');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 
 const root = path.join(__dirname, '..');
@@ -14,6 +17,28 @@ const jobs = [
   { svg: path.join(root, 'src/renderer/assets/icon.svg'), ico: 'build/icon.ico', png: ['build/icon.png', 'src/renderer/assets/icon.png'] },
   { svg: path.join(root, 'build/file.svg'), ico: 'build/file.ico', png: [] },
 ];
+
+// macOS icons follow Apple's grid (build/icon-mac.svg has the padding and shadow).
+const ICNS = [
+  { svg: path.join(root, 'build/icon-mac.svg'), icns: 'build/icon.icns' },
+  { svg: path.join(root, 'build/file.svg'), icns: 'build/file.icns' },
+];
+const ICONSET = [16, 32, 128, 256, 512]; // each also at @2x
+
+async function buildIcns(win, job) {
+  const svg = fs.readFileSync(job.svg, 'utf8');
+  const sizes = [...new Set(ICONSET.flatMap((s) => [s, s * 2]))];
+  const imgs = await rasterise(win, svg, sizes);
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mdv-')) + '/icon.iconset';
+  fs.mkdirSync(dir);
+  for (const s of ICONSET) {
+    fs.writeFileSync(path.join(dir, `icon_${s}x${s}.png`), imgs[s]);
+    fs.writeFileSync(path.join(dir, `icon_${s}x${s}@2x.png`), imgs[s * 2]);
+  }
+  execFileSync('iconutil', ['-c', 'icns', dir, '-o', path.join(root, job.icns)]);
+  fs.rmSync(path.dirname(dir), { recursive: true, force: true });
+  console.log('wrote', job.icns);
+}
 
 async function rasterise(win, svgText, sizes) {
   const b64 = Buffer.from(svgText).toString('base64');
@@ -74,6 +99,9 @@ app.whenReady().then(async () => {
     fs.writeFileSync(path.join(root, job.ico), buildIco(imgs));
     for (const p of job.png) fs.writeFileSync(path.join(root, p), big);
     console.log('wrote', job.ico, ...job.png);
+  }
+  if (process.platform === 'darwin') {
+    for (const job of ICNS) await buildIcns(win, job);
   }
   app.quit();
 });

@@ -2,7 +2,7 @@
   "name": "md-viewer",
   "productName": "MD Viewer",
   "version": "1.1.0",
-  "description": "A beautiful tabbed Markdown viewer for Windows",
+  "description": "A beautiful tabbed Markdown viewer for Windows and macOS",
   "main": "src/main/main.js",
   "author": "ndkedrov",
   "license": "MIT",
@@ -16,7 +16,10 @@
     "start": "electron .",
     "icon": "electron scripts/make-icon.js",
     "dist": "electron-builder --win nsis --publish never",
-    "dist:dir": "electron-builder --win dir"
+    "dist:dir": "electron-builder --win dir",
+    "dist:mac": "electron-builder --mac dmg --universal --publish never",
+    "dist:mas": "electron-builder --mac mas --universal --publish never",
+    "dist:mas-dev": "electron-builder --mac mas-dev --arm64 --publish never"
   },
   "build": {
     "appId": "com.ndkedrov.mdviewer",
@@ -30,20 +33,6 @@
       "src/**/*",
       "package.json"
     ],
-    "fileAssociations": [
-      {
-        "ext": [
-          "md",
-          "markdown",
-          "mdown",
-          "mkd"
-        ],
-        "name": "MDViewer.Markdown",
-        "description": "Markdown document",
-        "icon": "build/file.ico",
-        "role": "Viewer"
-      }
-    ],
     "win": {
       "target": [
         {
@@ -54,7 +43,21 @@
         }
       ],
       "icon": "build/icon.ico",
-      "artifactName": "MD-Viewer-Setup-${version}.${ext}"
+      "artifactName": "MD-Viewer-Setup-${version}.${ext}",
+      "fileAssociations": [
+        {
+          "ext": [
+            "md",
+            "markdown",
+            "mdown",
+            "mkd"
+          ],
+          "name": "MDViewer.Markdown",
+          "description": "Markdown document",
+          "icon": "build/file.ico",
+          "role": "Viewer"
+        }
+      ]
     },
     "nsis": {
       "oneClick": false,
@@ -67,7 +70,88 @@
       "uninstallerIcon": "build/icon.ico",
       "license": "LICENSE"
     },
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "build/icon.icns",
+      "minimumSystemVersion": "13.0",
+      "bundleVersion": "1",
+      "darkModeSupport": true,
+      "hardenedRuntime": true,
+      "notarize": true,
+      "artifactName": "MD-Viewer-${version}-mac.${ext}",
+      "extraResources": [
+        {
+          "from": "build/file.icns",
+          "to": "file.icns"
+        }
+      ],
+      "extendInfo": {
+        "ElectronTeamID": "4LZ5572PRZ",
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSHumanReadableCopyright": "Copyright © 2026 ndkedrov",
+        "CFBundleDocumentTypes": [
+          {
+            "CFBundleTypeName": "Markdown document",
+            "CFBundleTypeRole": "Viewer",
+            "LSHandlerRank": "Default",
+            "CFBundleTypeIconFile": "file.icns",
+            "LSItemContentTypes": [
+              "net.daringfireball.markdown"
+            ],
+            "CFBundleTypeExtensions": [
+              "md",
+              "markdown",
+              "mdown",
+              "mkd"
+            ]
+          }
+        ],
+        "UTImportedTypeDeclarations": [
+          {
+            "UTTypeIdentifier": "net.daringfireball.markdown",
+            "UTTypeDescription": "Markdown document",
+            "UTTypeConformsTo": [
+              "public.plain-text"
+            ],
+            "UTTypeIconFile": "file.icns",
+            "UTTypeReferenceURL": "https://daringfireball.net/projects/markdown/",
+            "UTTypeTagSpecification": {
+              "public.filename-extension": [
+                "md",
+                "markdown",
+                "mdown",
+                "mkd"
+              ],
+              "public.mime-type": [
+                "text/markdown"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "dmg": {
+      "title": "MD Viewer ${version}"
+    },
+    "mas": {
+      "type": "distribution",
+      "hardenedRuntime": false,
+      "notarize": false,
+      "entitlements": "build/entitlements.mas.plist",
+      "entitlementsInherit": "build/entitlements.mas.inherit.plist",
+      "provisioningProfile": "build/MD_Viewer_Mac_App_Store.provisionprofile",
+      "artifactName": "MD-Viewer-${version}-mas.${ext}"
+    },
+    "masDev": {
+      "type": "development",
+      "hardenedRuntime": false,
+      "notarize": false,
+      "entitlements": "build/entitlements.mas.plist",
+      "entitlementsInherit": "build/entitlements.mas.inherit.plist",
+      "provisioningProfile": "build/MD_Viewer_Mac_Development.provisionprofile"
+    },
     "electronLanguages": [
+      "en",
       "en-US",
       "uk"
     ],

@@ -1,0 +1,32 @@
+{
+  "bundleId": "com.ndkedrov.mdviewer",
+  "primaryLocale": "en-US",
+  "category": "PRODUCTIVITY",
+  "secondaryCategory": "DEVELOPER_TOOLS",
+  "price": "free",
+  "copyright": "2026 Andrii Kedrov",
+  "contentRights": "DOES_NOT_USE_THIRD_PARTY_CONTENT",
+  "ageRating": "4+ (no objectionable content)",
+  "privacy": "Data Not Collected",
+  "localizations": {
+    "en-US": {
+      "subtitle": "Read Markdown in tabs",
+      "promotionalText": "Open as many Markdown files as you like, each in its own tab, with a live outline, dark mode and diagrams.",
+      "keywords": "markdown,md,reader,viewer,readme,documentation,notes,preview,mermaid,outline,tabs,docs",
+      "supportUrl": "https://github.com/ndkedrov/md-viewer/issues",
+      "marketingUrl": "https://github.com/ndkedrov/md-viewer",
+      "privacyPolicyUrl": "https://github.com/ndkedrov/md-viewer/blob/main/PRIVACY.md",
+      "description": "MD Viewer is a clean, fast reader for Markdown files. Open as many documents as you like: each one gets its own tab, just like in a code editor.\n\nREAD COMFORTABLY\n• Tabs with drag to reorder, reopen closed tab and Open Recent\n• An outline on the side that highlights the section you are reading\n• Light and dark themes that follow your Mac, adjustable page width and text size\n• Find in document, print, full screen\n\nEVERYTHING RENDERS\n• Tables, task lists, footnotes, emoji and front matter\n• Syntax highlighting with a copy button\n• Mermaid diagrams and callouts like > [!NOTE]\n• Pictures and links next to the file: relative links open the linked document in a new tab\n\nALWAYS UP TO DATE\nSave the file in any editor and the tab refreshes without losing your place.\n\nMADE FOR THE MAC\nA native menu bar, keyboard shortcuts you already know, and open tabs restored at the next launch. The interface is available in English and Ukrainian.\n\nPRIVATE\nNo accounts, no analytics, no ads. Your documents never leave your Mac. Scripts inside documents are stripped, so unknown files are safe to open.\n\nTerms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/\nTerms of Service: https://github.com/ndkedrov/md-viewer/blob/main/TERMS.md\nPrivacy Policy: https://github.com/ndkedrov/md-viewer/blob/main/PRIVACY.md"
+    },
+    "uk": {
+      "subtitle": "Markdown у вкладках",
+      "promotionalText": "Відкривайте скільки завгодно Markdown-файлів, кожен у своїй вкладці: живий зміст, темна тема й діаграми.",
+      "keywords": "markdown,md,переглядач,читання,readme,документація,нотатки,перегляд,mermaid,вкладки,зміст",
+      "supportUrl": "https://github.com/ndkedrov/md-viewer/issues",
+      "marketingUrl": "https://github.com/ndkedrov/md-viewer",
+      "privacyPolicyUrl": "https://github.com/ndkedrov/md-viewer/blob/main/PRIVACY.md",
+      "description": "MD Viewer — зручна й швидка програма для читання Markdown-файлів. Відкривайте скільки завгодно документів: кожен у своїй вкладці, як у редакторі коду.\n\nЧИТАТИ ЗРУЧНО\n• Вкладки з перетягуванням, поверненням закритої та списком «Відкрити нещодавні»\n• Зміст збоку підсвічує розділ, який ви читаєте\n• Світла й темна теми за налаштуваннями Mac, ширина сторінки й розмір тексту\n• Пошук у документі, друк, повноекранний режим\n\nУСЕ ВІДОБРАЖАЄТЬСЯ\n• Таблиці, списки задач, виноски, емодзі та front matter\n• Підсвітка коду з кнопкою «Копіювати»\n• Діаграми Mermaid і блоки > [!NOTE]\n• Картинки й посилання поруч із файлом: відносні посилання відкривають документ у новій вкладці\n\nЗАВЖДИ АКТУАЛЬНО\nЗбережіть файл в іншому редакторі — вкладка оновиться й не загубить місце, де ви читали.\n\nЗРОБЛЕНО ДЛЯ MAC\nРідне меню, звичні клавіатурні скорочення, відкриті вкладки повертаються після перезапуску. Інтерфейс українською та англійською.\n\nПРИВАТНО\nБез облікових записів, аналітики й реклами. Ваші документи не залишають Mac. Скрипти з документів вирізаються, тож незнайомі файли відкривати безпечно.\n\nУмови використання (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/\nУмови надання послуг: https://github.com/ndkedrov/md-viewer/blob/main/TERMS.md\nПолітика конфіденційності: https://github.com/ndkedrov/md-viewer/blob/main/PRIVACY.md"
+    }
+  },
+  "reviewNotes": "MD Viewer is a free, offline Markdown reader with no sign-in. To test: File > Open (Cmd+O) and pick any .md file, or drag one onto the window. When a document shows pictures from its own folder, the app asks for read-only access to that folder once (sandbox) and remembers it with a security-scoped bookmark."
+}

@@ -4,3 +4,6 @@ dist/
 .DS_Store
 Thumbs.db
 src/renderer/vendor/
+
+# Provisioning profiles live outside the repo (see README)
+build/*.provisionprofile

@@ -11,7 +11,8 @@ const on = (channel) => (cb) => {
 contextBridge.exposeInMainWorld('api', {
   load: (p) => ipcRenderer.invoke('doc:load', p),
   unwatch: (p) => ipcRenderer.invoke('doc:unwatch', p),
-  openDialog: () => ipcRenderer.invoke('dialog:open'),
+  openDialog: (defaultPath) => ipcRenderer.invoke('dialog:open', defaultPath),
+  grantFolder: (dir, message, button) => ipcRenderer.invoke('access:folder', dir, message, button),
   resolvePath: (base, rel) => ipcRenderer.invoke('path:resolve', base, rel),
   openExternal: (url) => ipcRenderer.invoke('shell:external', url),
   openPath: (p) => ipcRenderer.invoke('shell:openPath', p),
@@ -22,9 +23,11 @@ contextBridge.exposeInMainWorld('api', {
   assocStatus: () => ipcRenderer.invoke('assoc:status'),
   assocChoose: (p) => ipcRenderer.invoke('assoc:choose', p),
   menu: (template) => ipcRenderer.invoke('menu:popup', template),
+  setAppMenu: (template) => ipcRenderer.invoke('menu:app', template),
   pathForFile: (file) => webUtils.getPathForFile(file),
   onOpenFiles: on('open-files'),
   onDocChanged: on('doc-changed'),
   onThemeChanged: on('theme-changed'),
   onWindowState: on('window-state'),
+  onCommand: on('command'),
 });

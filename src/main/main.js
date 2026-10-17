@@ -14,11 +14,14 @@ const CHROME = {
   light: { color: '#eceef3', symbolColor: '#3b4150' },
 };
 const BAR_HEIGHT = 42;
+const IS_MAC = process.platform === 'darwin';
+const IS_MAS = !!process.mas; // Mac App Store build: runs in the App Sandbox
 
 // Separate profile for dev runs and screenshots, so they don't touch real settings.
 if (!app.isPackaged && process.env.MDVIEWER_PROFILE) app.setPath('userData', process.env.MDVIEWER_PROFILE);
 
 let win = null;
+let rendererReady = false; // the renderer has asked for its settings and listens for files
 let pendingFiles = [];
 const watched = new Map(); // path -> listener
 
@@ -74,7 +77,10 @@ function createWindow() {
     icon: path.join(__dirname, '..', 'renderer', 'assets', 'icon.png'),
     backgroundColor: theme === 'dark' ? '#11141b' : '#ffffff',
     titleBarStyle: 'hidden',
-    titleBarOverlay: { ...CHROME[theme], height: BAR_HEIGHT },
+    // macOS keeps its traffic lights on the left, centred in our tab bar.
+    ...(IS_MAC
+      ? { trafficLightPosition: { x: 16, y: 14 } }
+      : { titleBarOverlay: { ...CHROME[theme], height: BAR_HEIGHT } }),
     webPreferences: {
       preload: path.join(__dirname, '..', 'preload', 'preload.js'),
       contextIsolation: true,
@@ -126,8 +132,13 @@ function createWindow() {
   win.on('move', saveBounds);
   win.on('maximize', () => win.webContents.send('window-state', { maximized: true }));
   win.on('unmaximize', () => win.webContents.send('window-state', { maximized: false }));
+  // Full screen hides the traffic lights, so the tab bar can use their space.
+  win.on('enter-full-screen', () => win.webContents.send('window-state', { fullscreen: true }));
+  win.on('leave-full-screen', () => win.webContents.send('window-state', { fullscreen: false }));
+  win.webContents.on('did-start-loading', () => { rendererReady = false; });
   win.on('closed', () => {
     win = null;
+    rendererReady = false;
     for (const p of [...watched.keys()]) unwatch(p);
   });
 }
@@ -166,34 +177,56 @@ ipcMain.handle('doc:load', async (_e, p) => {
       name: path.basename(p),
       dir: path.dirname(p),
       dirUrl: pathToFileURL(path.dirname(p) + path.sep).href,
+      dirAccess: canListDir(path.dirname(p)),
       size: stat.size,
       mtime: stat.mtimeMs,
       ...out,
     };
   } catch (err) {
-    return { ok: false, path: p, name: path.basename(p), error: err.message };
+    const denied = IS_MAS && (err.code === 'EPERM' || err.code === 'EACCES');
+    return { ok: false, path: p, name: path.basename(p), error: err.message, denied };
   }
 });
 
 ipcMain.handle('doc:unwatch', (_e, p) => unwatch(p));
 
-ipcMain.handle('dialog:open', async () => {
+ipcMain.handle('dialog:open', async (_e, defaultPath) => {
   const res = await dialog.showOpenDialog(win, {
     properties: ['openFile', 'multiSelections'],
+    defaultPath: defaultPath || undefined,
+    securityScopedBookmarks: IS_MAS,
     filters: [
       { name: 'Markdown', extensions: ['md', 'markdown', 'mdown', 'mkd', 'mdx'] },
       { name: 'Text', extensions: ['txt'] },
       { name: '*', extensions: ['*'] },
     ],
   });
-  return res.canceled ? [] : res.filePaths;
+  if (res.canceled) return [];
+  remember(res.filePaths, res.bookmarks);
+  return res.filePaths;
+});
+
+// App Store build: a document's folder is only readable after the user picks
+// it once, which lets relative images and links work.
+ipcMain.handle('access:folder', async (_e, dir, message, buttonLabel) => {
+  const res = await dialog.showOpenDialog(win, {
+    properties: ['openDirectory'],
+    defaultPath: dir || undefined,
+    message: message || undefined,
+    buttonLabel: buttonLabel || undefined,
+    securityScopedBookmarks: IS_MAS,
+  });
+  if (res.canceled) return false;
+  remember(res.filePaths, res.bookmarks);
+  return true;
 });
 
 ipcMain.handle('path:resolve', (_e, base, rel) => {
   const target = path.resolve(base, decodeURIComponent(rel));
   let exists = false;
-  try { exists = fs.statSync(target).isFile(); } catch { /* missing */ }
-  return { path: target, exists, isMarkdown: MD_EXT.test(target) };
+  let denied = false;
+  try { exists = fs.statSync(target).isFile(); } catch (err) { denied = IS_MAS && (err.code === 'EPERM' || err.code === 'EACCES'); }
+  return { path: target, exists, denied, isMarkdown: MD_EXT.test(target) };
 });
 
 ipcMain.handle('shell:external', (_e, url) => {
@@ -215,11 +248,15 @@ ipcMain.handle('settings:get', () => {
   if (all.session && Array.isArray(all.session.files)) {
     all.session = { ...all.session, files: all.session.files.filter(isFile) };
   }
+  rendererReady = true;
+  delete all.bookmarks;
   return {
     ...all,
     effectiveTheme: effectiveTheme(),
     locale: app.getLocale(),
     version: app.getVersion(),
+    platform: process.platform,
+    mas: IS_MAS,
     pendingFiles: pendingFiles.splice(0),
   };
 });
@@ -249,6 +286,67 @@ function popup(template) {
 
 ipcMain.handle('menu:popup', (_e, template) => popup(template));
 
+// ---------- macOS menu bar ----------
+// The renderer owns the labels (they live in i18n.js) and sends the whole
+// template; items with an id report back as commands, roles stay native.
+
+function toAppMenu(items) {
+  return items.map((it) => {
+    const out = { ...it };
+    if (it.submenu) out.submenu = toAppMenu(it.submenu);
+    if (it.id) {
+      const cmd = it.id;
+      out.click = () => {
+        if (win) win.webContents.send('command', cmd);
+        else if (cmd === 'open') { createWindow(); pendingCommand = 'open'; }
+        else createWindow();
+      };
+    }
+    return out;
+  });
+}
+
+let pendingCommand = null;
+
+ipcMain.handle('menu:app', (_e, template) => {
+  if (!IS_MAC) return;
+  Menu.setApplicationMenu(Menu.buildFromTemplate(toAppMenu(template)));
+  if (pendingCommand && win) { win.webContents.send('command', pendingCommand); pendingCommand = null; }
+});
+
+// ---------- sandbox access (App Store build) ----------
+
+function canListDir(dir) {
+  if (!IS_MAS) return true;
+  try { fs.readdirSync(dir); return true; } catch { return false; }
+}
+
+const stopAccess = new Map(); // path -> stop function
+
+function startAccess(p, bookmark) {
+  if (stopAccess.has(p)) return;
+  try { stopAccess.set(p, app.startAccessingSecurityScopedResource(bookmark)); } catch { /* stale bookmark */ }
+}
+
+function remember(paths, bookmarks) {
+  if (!IS_MAS || !Array.isArray(bookmarks)) return;
+  const all = { ...store.get('bookmarks', {}) };
+  paths.forEach((p, i) => {
+    if (!bookmarks[i]) return;
+    all[p] = bookmarks[i];
+    startAccess(p, bookmarks[i]);
+  });
+  // Keep the list bounded: the newest 200 grants are plenty for recent files and folders.
+  const keys = Object.keys(all);
+  for (const k of keys.slice(0, Math.max(0, keys.length - 200))) delete all[k];
+  store.set('bookmarks', all);
+}
+
+function restoreAccess() {
+  if (!IS_MAS) return;
+  for (const [p, b] of Object.entries(store.get('bookmarks', {}))) startAccess(p, b);
+}
+
 nativeTheme.on('updated', () => {
   applyChrome();
   if (win) win.webContents.send('theme-changed', effectiveTheme());
@@ -256,17 +354,37 @@ nativeTheme.on('updated', () => {
 
 // ---------- lifecycle ----------
 
+// macOS hands over files from Finder (double click, drop on the Dock icon).
 app.on('open-file', (e, p) => {
   e.preventDefault();
-  if (win) win.webContents.send('open-files', [p]);
-  else pendingFiles.push(p);
+  if (win && rendererReady) {
+    win.webContents.send('open-files', [p]);
+    if (win.isMinimized()) win.restore();
+    win.focus();
+    return;
+  }
+  pendingFiles.push(p);
+  if (!win && app.isReady()) createWindow();
 });
 
 app.whenReady().then(() => {
+  // On macOS the renderer installs a localized menu bar right after it loads.
   Menu.setApplicationMenu(null);
   nativeTheme.themeSource = store.get('theme', 'system');
+  restoreAccess();
   pendingFiles.push(...filesFromArgv(process.argv));
   createWindow();
 });
 
-app.on('window-all-closed', () => app.quit());
+// A Mac app stays alive without windows and reopens one from the Dock.
+app.on('activate', () => {
+  if (!win && app.isReady()) createWindow();
+});
+
+app.on('window-all-closed', () => {
+  if (!IS_MAC) app.quit();
+});
+
+app.on('will-quit', () => {
+  for (const stop of stopAccess.values()) { try { stop(); } catch { /* already released */ } }
+});
