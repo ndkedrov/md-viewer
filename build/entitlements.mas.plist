@@ -8,10 +8,10 @@
   <!-- Electron needs a team-prefixed app group for its helper processes -->
   <key>com.apple.security.application-groups</key>
   <array>
-    <string>4LZ5572PRZ.com.ndkedrov.mdviewer</string>
+    <string>4LZ5572PRZ.mdviewer.serenity.games</string>
   </array>
   <key>com.apple.application-identifier</key>
-  <string>4LZ5572PRZ.com.ndkedrov.mdviewer</string>
+  <string>4LZ5572PRZ.mdviewer.serenity.games</string>
   <key>com.apple.developer.team-identifier</key>
   <string>4LZ5572PRZ</string>
   <!-- Read the documents and folders the user opens, and remember them between launches -->

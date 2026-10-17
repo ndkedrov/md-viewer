@@ -71,6 +71,7 @@
       "license": "LICENSE"
     },
     "mac": {
+      "appId": "mdviewer.serenity.games",
       "category": "public.app-category.productivity",
       "icon": "build/icon.icns",
       "minimumSystemVersion": "13.0",
@@ -134,6 +135,7 @@
       "title": "MD Viewer ${version}"
     },
     "mas": {
+      "appId": "mdviewer.serenity.games",
       "type": "distribution",
       "hardenedRuntime": false,
       "notarize": false,
@@ -143,6 +145,7 @@
       "artifactName": "MD-Viewer-${version}-mas.${ext}"
     },
     "masDev": {
+      "appId": "mdviewer.serenity.games",
       "type": "development",
       "hardenedRuntime": false,
       "notarize": false,
